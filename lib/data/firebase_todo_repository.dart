@@ -70,7 +70,6 @@ class FirebaseTodoRepository implements FirebaseRepository {
           .where('id', isEqualTo: todo.id)
           .get();
 
-      print('querySnapshot.docs.first.id ${querySnapshot.docs.first.id}');
       await FirebaseFirestore.instance
           .collection('todoAPP')
           .doc(querySnapshot.docs.first.id)
