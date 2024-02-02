@@ -1,5 +1,5 @@
-class FirebaseTodoSuccess {
+class Success {
   final String success;
 
-  FirebaseTodoSuccess({this.success = ""});
+  Success({this.success = ""});
 }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:todo_bloc/data/todo_model.dart';
 import 'package:todo_bloc/domain/failures/firebase_todo_failure.dart';
 import 'package:todo_bloc/domain/repositories/firebase_repository.dart';
@@ -7,7 +8,7 @@ import 'package:todo_bloc/domain/success/firebase_todo_success.dart';
 
 class FirebaseTodoRepository implements FirebaseRepository {
   @override
-  Future<Either<FirebaseTodoFailure, List<TodoModel>>> getAllTodo() async {
+  Future<Either<Failure, List<TodoModel>>> getAllTodo() async {
     try {
       // Fetch data from Firestore using await
       final querySnapshot =
@@ -26,28 +27,26 @@ class FirebaseTodoRepository implements FirebaseRepository {
       return right(todos);
     } catch (ex) {
       // Handle errors
-      return left(FirebaseTodoFailure(error: 'Error fetching todos: $ex'));
+      return left(Failure(error: 'Error fetching todos: $ex'));
     }
   }
 
   @override
-  Future<Either<FirebaseTodoFailure, FirebaseTodoSuccess>> addTodo(
-      TodoModel todo) async {
+  Future<Either<Failure, Success>> addTodo(TodoModel todo) async {
     try {
       right(await FirebaseFirestore.instance
           .collection('todoAPP')
           .add(todo.toMap()));
-      return right(FirebaseTodoSuccess(success: 'successfully added'));
+      return right(Success(success: 'successfully added'));
       // If you want to handle success or notify listeners, you can emit a state from here
     } catch (ex) {
-      return left(FirebaseTodoFailure(error: 'Error adding todo: $ex'));
+      return left(Failure(error: 'Error adding todo: $ex'));
       // Handle the error as needed
     }
   }
 
   @override
-  Future<Either<FirebaseTodoFailure, FirebaseTodoSuccess>> deleteTodoById(
-      String id) async {
+  Future<Either<Failure, Success>> deleteTodoById(String id) async {
     try {
       final querySnapshot = await FirebaseFirestore.instance
           .collection('todoAPP')
@@ -55,15 +54,14 @@ class FirebaseTodoRepository implements FirebaseRepository {
           .get();
       id = querySnapshot.docs.first.id;
       await FirebaseFirestore.instance.collection('todoAPP').doc(id).delete();
-      return right(FirebaseTodoSuccess(success: 'Deleted todo successfully'));
+      return right(Success(success: 'Deleted todo successfully'));
     } catch (ex) {
-      return left(FirebaseTodoFailure(error: 'Error getting todo ID: $ex'));
+      return left(Failure(error: 'Error getting todo ID: $ex'));
     }
   }
 
   @override
-  Future<Either<FirebaseTodoFailure, FirebaseTodoSuccess>> completeTodoById(
-      TodoModel todo) async {
+  Future<Either<Failure, Success>> completeTodoById(TodoModel todo) async {
     try {
       final querySnapshot = await FirebaseFirestore.instance
           .collection('todoAPP')
@@ -75,9 +73,19 @@ class FirebaseTodoRepository implements FirebaseRepository {
           .doc(querySnapshot.docs.first.id)
           .update({'completed': !todo.completed});
 
-      return right(FirebaseTodoSuccess(success: 'Updated Successfully'));
+      return right(Success(success: 'Updated Successfully'));
     } catch (ex) {
-      return left(FirebaseTodoFailure(error: 'Update todo error: $ex'));
+      return left(Failure(error: 'Update todo error: $ex'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Success>> logoutUser() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      return right(Success(success: 'logout'));
+    } catch (ex) {
+      return left(Failure(error: 'Logout Error: $ex'));
     }
   }
 }

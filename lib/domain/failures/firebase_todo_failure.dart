@@ -1,5 +1,5 @@
-class FirebaseTodoFailure {
+class Failure {
   final String error;
 
-  FirebaseTodoFailure({this.error = ""});
+  Failure({this.error = ""});
 }

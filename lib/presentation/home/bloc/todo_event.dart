@@ -41,3 +41,5 @@ class DoneTodo extends TodoEvent {
   @override
   List<Object?> get props => [doneTodo];
 }
+
+final class LogoutRequested extends TodoEvent {}

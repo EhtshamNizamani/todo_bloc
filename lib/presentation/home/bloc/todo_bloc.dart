@@ -1,9 +1,9 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:todo_bloc/data/todo_model.dart';
-import 'package:todo_bloc/data/firebase_todo_repository.dart';
 import 'package:todo_bloc/domain/repositories/firebase_repository.dart';
 import 'package:todo_bloc/presentation/home/bloc/todo_state.dart';
 
@@ -16,6 +16,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     on<AddTodo>(onAddTodo);
     on<DoneTodo>(onDoneTodo);
     on<DeleteTodo>(onDeleteTodo);
+    on<LogoutRequested>(onLogoutRequested);
   }
   Future<void> onGetAllTodo(GetAllTodo event, Emitter<TodoState> emit) async {
     emit(state.copyWith(isLoading: true));
@@ -86,5 +87,10 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     List<TodoModel> allTodo = List.from(state.todoList)..remove(todo);
 
     emit(state.copyWith(todos: allTodo));
+  }
+
+  FutureOr<void> onLogoutRequested(
+      LogoutRequested event, Emitter<TodoState> emit) async {
+    await firebaseTodoRepository.logoutUser();
   }
 }

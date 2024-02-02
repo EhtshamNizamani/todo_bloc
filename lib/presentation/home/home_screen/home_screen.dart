@@ -36,6 +36,12 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.grey.shade300,
       appBar: AppBar(
         title: const Text('Todo Add'),
+        actions: [
+          IconButton(
+              onPressed: () =>
+                  BlocProvider.of<TodoBloc>(context).add(LogoutRequested()),
+              icon: Icon(Icons.logout_outlined))
+        ],
       ),
       body: BlocBuilder<TodoBloc, TodoState>(
         builder: (context, state) {
